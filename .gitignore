@@ -1,1 +1,5 @@
 /.metadata/
+*.log
+.analytics
+ZBSAR_TOP/platform.tcl
+*.bin
