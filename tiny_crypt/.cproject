@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+    	
+    <storageModule moduleId="org.eclipse.cdt.core.settings">
+        		
+        <cconfiguration id="xilinx.gnu.mb.staticlib.debug.134730843">
+            			
+            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="xilinx.gnu.mb.staticlib.debug.134730843" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+                				
+                <externalSettings/>
+                				
+                <extensions>
+                    					
+                    <extension id="com.xilinx.sdk.managedbuilder.XELF.mb" point="org.eclipse.cdt.core.BinaryParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    				
+                </extensions>
+                			
+            </storageModule>
+            			
+            <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+                				
+                <configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.staticlib.debug.134730843" name="Debug" parent="xilinx.gnu.mb.staticlib.debug">
+                    					
+                    <folderInfo id="xilinx.gnu.mb.staticlib.debug.134730843." name="/" resourcePath="">
+                        						
+                        <toolChain id="xilinx.gnu.mb.static.debug.toolchain.1283264991" name="Vitis MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.static.debug.toolchain">
+                            							
+                            <targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.lib.target.gnu.base.debug.204509378" isAbstract="false" name="Debug Platform" superClass="xilinx.mb.lib.target.gnu.base.debug"/>
+                            							
+                            <builder buildPath="${workspace_loc:/tiny_crypt}/Debug" enableAutoBuild="true" id="xilinx.gnu.mb.toolchain.builder.staticlib.debug.791430966" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" superClass="xilinx.gnu.mb.toolchain.builder.staticlib.debug"/>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.assembler.staticlib.debug.8077939" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.staticlib.debug">
+                                								
+                                <inputType id="xilinx.gnu.assembler.input.559088370" superClass="xilinx.gnu.assembler.input"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.compiler.staticlib.debug.1003732771" name="MicroBlaze gcc compiler" superClass="xilinx.gnu.mb.c.toolchain.compiler.staticlib.debug">
+                                								
+                                <option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.1711623404" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.option.debugging.level.1964591446" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.misc.other.40004825" name="Other flags" superClass="xilinx.gnu.compiler.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -MT&quot;$@&quot; " valueType="string"/>
+                                								
+                                <option id="xilinx.gnu.compiler.dircategory.includes.1806865960" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" useByScannerDiscovery="false" valueType="includePath">
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/ZBSAR_TOP/microblaze_0/freertos10_xilinx_microblaze_0/bsp/microblaze_0/include}&quot;"/>
+                                    								
+                                </option>
+                                								
+                                <option id="xilinx.gnu.mb.compiler.inferred.usediv.609591188" superClass="xilinx.gnu.mb.compiler.inferred.usediv" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
+                                <option id="xilinx.gnu.mb.compiler.inferred.usepcmp.1123756711" superClass="xilinx.gnu.mb.compiler.inferred.usepcmp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
+                                <option id="xilinx.gnu.mb.compiler.inferred.usebarrel.932439805" superClass="xilinx.gnu.mb.compiler.inferred.usebarrel" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
+                                <option id="xilinx.gnu.mb.compiler.inferred.usele.1360382311" superClass="xilinx.gnu.mb.compiler.inferred.usele" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
+                                <inputType id="xilinx.gnu.compiler.input.131933261" name="C source files" superClass="xilinx.gnu.compiler.input"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.cxx.toolchain.compiler.staticlib.debug.2025552613" name="MicroBlaze g++ compiler" superClass="xilinx.gnu.mb.cxx.toolchain.compiler.staticlib.debug">
+                                								
+                                <option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.713276179" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.option.debugging.level.1048697501" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.toolchain.archiver.staticlib.debug.2113876667" name="MicroBlaze archiver" superClass="xilinx.gnu.mb.toolchain.archiver.staticlib.debug"/>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.linker.28521705" name="MicroBlaze gcc linker" superClass="xilinx.gnu.mb.c.toolchain.linker"/>
+                            							
+                            <tool id="xilinx.gnu.mb.cxx.toolchain.linker.144459798" name="MicroBlaze g++ linker" superClass="xilinx.gnu.mb.cxx.toolchain.linker"/>
+                            						
+                        </toolChain>
+                        					
+                    </folderInfo>
+                    				
+                </configuration>
+                			
+            </storageModule>
+            			
+            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+            		
+        </cconfiguration>
+        		
+        <cconfiguration id="xilinx.gnu.mb.staticlib.release.375609021">
+            			
+            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="xilinx.gnu.mb.staticlib.release.375609021" moduleId="org.eclipse.cdt.core.settings" name="Release">
+                				
+                <externalSettings/>
+                				
+                <extensions>
+                    					
+                    <extension id="com.xilinx.sdk.managedbuilder.XELF.mb" point="org.eclipse.cdt.core.BinaryParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+                    					
+                    <extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+                    				
+                </extensions>
+                			
+            </storageModule>
+            			
+            <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+                				
+                <configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.staticlib.release.375609021" name="Release" parent="xilinx.gnu.mb.staticlib.release">
+                    					
+                    <folderInfo id="xilinx.gnu.mb.staticlib.release.375609021." name="/" resourcePath="">
+                        						
+                        <toolChain id="xilinx.gnu.mb.staticlib.release.toolchain.226716152" name="Vitis MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.staticlib.release.toolchain">
+                            							
+                            <targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.lib.target.gnu.base.release.648547636" isAbstract="false" name="Release Platform" superClass="xilinx.mb.lib.target.gnu.base.release"/>
+                            							
+                            <builder buildPath="${workspace_loc:/tiny_crypt}/Release" enableAutoBuild="true" id="xilinx.gnu.mb.toolchain.builder.staticlib.release.193997721" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" superClass="xilinx.gnu.mb.toolchain.builder.staticlib.release"/>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.assembler.staticlib.release.1582238695" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.staticlib.release">
+                                								
+                                <inputType id="xilinx.gnu.assembler.input.1299002999" superClass="xilinx.gnu.assembler.input"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.compiler.staticlib.release.346769728" name="MicroBlaze gcc compiler" superClass="xilinx.gnu.mb.c.toolchain.compiler.staticlib.release">
+                                								
+                                <option defaultValue="gnu.c.optimization.level.more" id="xilinx.gnu.compiler.option.optimization.level.55047400" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.option.debugging.level.2145127910" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.misc.other.907939975" name="Other flags" superClass="xilinx.gnu.compiler.misc.other" value="-c -fmessage-length=0 -MT&quot;$@&quot; " valueType="string"/>
+                                								
+                                <inputType id="xilinx.gnu.compiler.input.332533903" name="C source files" superClass="xilinx.gnu.compiler.input"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.cxx.toolchain.compiler.staticlib.release.1026825725" name="MicroBlaze g++ compiler" superClass="xilinx.gnu.mb.cxx.toolchain.compiler.staticlib.release">
+                                								
+                                <option defaultValue="gnu.c.optimization.level.more" id="xilinx.gnu.compiler.option.optimization.level.1510534501" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" valueType="enumerated"/>
+                                								
+                                <option id="xilinx.gnu.compiler.option.debugging.level.1323883219" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+                                							
+                            </tool>
+                            							
+                            <tool id="xilinx.gnu.mb.toolchain.archiver.statclib.release.1614668826" name="MicroBlaze archiver" superClass="xilinx.gnu.mb.toolchain.archiver.statclib.release"/>
+                            							
+                            <tool id="xilinx.gnu.mb.c.toolchain.linker.1512364826" name="MicroBlaze gcc linker" superClass="xilinx.gnu.mb.c.toolchain.linker"/>
+                            							
+                            <tool id="xilinx.gnu.mb.cxx.toolchain.linker.897667932" name="MicroBlaze g++ linker" superClass="xilinx.gnu.mb.cxx.toolchain.linker"/>
+                            						
+                        </toolChain>
+                        					
+                    </folderInfo>
+                    				
+                </configuration>
+                			
+            </storageModule>
+            			
+            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+            		
+        </cconfiguration>
+        	
+    </storageModule>
+    	
+    <storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+    	
+    <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+        		
+        <project id="tiny_crypt.xilinx.gnu.mb.staticlib.1989076304" name="Vitis MicroBlaze Static Library" projectType="xilinx.gnu.mb.staticlib"/>
+        	
+    </storageModule>
+    	
+    <storageModule moduleId="scannerConfiguration">
+        		
+        <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+        		
+        <scannerConfigBuildInfo instanceId="xilinx.gnu.mb.staticlib.debug.134730843;xilinx.gnu.mb.staticlib.debug.134730843.;xilinx.gnu.mb.c.toolchain.compiler.staticlib.debug.1003732771;xilinx.gnu.compiler.input.131933261">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.MBGCCManagedMakePerProjectProfileC"/>
+            		
+        </scannerConfigBuildInfo>
+        		
+        <scannerConfigBuildInfo instanceId="xilinx.gnu.mb.staticlib.release.375609021;xilinx.gnu.mb.staticlib.release.375609021.">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.MBGCCManagedMakePerProjectProfileC"/>
+            		
+        </scannerConfigBuildInfo>
+        		
+        <scannerConfigBuildInfo instanceId="xilinx.gnu.mb.staticlib.release.375609021;xilinx.gnu.mb.staticlib.release.375609021.;xilinx.gnu.mb.c.toolchain.compiler.staticlib.release.346769728;xilinx.gnu.compiler.input.332533903">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.MBGCCManagedMakePerProjectProfileC"/>
+            		
+        </scannerConfigBuildInfo>
+        		
+        <scannerConfigBuildInfo instanceId="xilinx.gnu.mb.staticlib.debug.134730843;xilinx.gnu.mb.staticlib.debug.134730843.">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.MBGCCManagedMakePerProjectProfileC"/>
+            		
+        </scannerConfigBuildInfo>
+        	
+    </storageModule>
+    	
+    <storageModule moduleId="refreshScope"/>
+    
+</cproject>

@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+import 'nanopb.proto';
+
+enum ChannelType
+{
+  SYNC_RS422_TX = 0;
+  SYNC_RS422_RX = 1;
+  BNC = 2;
+  WAVE = 3;
+  // 可根据需要添加其他通道类型
+}
+
+// 消息结构
+message SubMsg1 {
+
+  // 时间标识(可以是时间戳ms)
+  uint64 timestamp = 1;
+
+  // 通道标识
+  uint32 channel = 2;
+  
+  uint32 trans_bits  = 3;
+  // 数据字段
+  bytes data0 = 4[(nanopb).max_size = 1024];
+  bytes data1 = 5[(nanopb).max_size = 1024];
+  bytes data2 = 6[(nanopb).max_size = 1024];
+  bytes data3 = 7[(nanopb).max_size = 1024];
+
+  uint32 frame_num = 8;
+}
+
+message SubMsg2 {
+
+  // 时间标识(可以是时间戳)
+  uint64 timestamp = 1;
+
+  // 通道标识
+  uint32 channel = 2;
+  
+  int32 event_code = 3; //
+}
+
+message SubMsg3 {
+
+  // 时间标识(可以是时间戳ms)
+  uint64 timestamp = 1;  
+
+  // 通道标识
+  uint32 channel = 2;
+  
+  // 数据字段
+  repeated uint32 data0 = 3 [(nanopb).max_count = 1024];
+  repeated uint32 data1 = 4 [(nanopb).max_count = 1024];
+  repeated uint32 data2 = 5 [(nanopb).max_count = 1024];
+  repeated uint32 data3 = 6 [(nanopb).max_count = 1024];
+  repeated uint32 data4 = 7 [(nanopb).max_count = 1024];
+  repeated uint32 data5 = 8 [(nanopb).max_count = 1024];
+  repeated uint32 data6 = 9 [(nanopb).max_count = 1024];
+  repeated uint32 data7 = 10 [(nanopb).max_count = 1024]; 
+  repeated uint32 data8 = 11 [(nanopb).max_count = 1024];
+  repeated uint32 data9 = 12 [(nanopb).max_count = 1024];
+}
+
+message SubMsg4 {
+
+  // 时间标识(可以是时间戳ms)
+  uint64 timestamp = 1;
+
+  // 通道标识
+  uint32 channel = 2;
+  
+  // 数据字段
+  bytes data0 = 4[(nanopb).max_size = 1024];
+  bytes data1 = 5[(nanopb).max_size = 1024];
+  bytes data2 = 6[(nanopb).max_size = 1024];
+  bytes data3 = 7[(nanopb).max_size = 1024];
+  bytes data4 = 8[(nanopb).max_size = 1024];
+}
+message SubMsg5 {
+
+  // 时间标识(可以是时间戳ms)
+  uint64 timestamp = 1;
+
+  // 通道标识
+  uint32 channel = 2;
+  
+  // 数据字段
+  bytes data0 = 3[(nanopb).max_size = 1024];
+}
+message OneOfMessage
+{
+    option (nanopb_msgopt).submsg_callback = false;
+
+    uint32 ver = 1 ; //协议版本
+    ChannelType type = 2; //通道类型
+    uint32 id = 3 ; //消息id
+    oneof values
+    {
+        SubMsg1 submsg1 = 4; //消息类1
+        SubMsg2 submsg2 = 5; //消息类2
+        SubMsg3 submsg3 = 6; //消息类3
+        SubMsg4 submsg4 = 7; //消息类4
+        SubMsg5 submsg5 = 8; //
+    }
+    uint32 crc16 = 99;  
+}
+

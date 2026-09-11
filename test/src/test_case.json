@@ -1,0 +1,21 @@
+
+{
+    "file_mode": true, //文件模式或者码片模式
+    "testcycles": 10, //文件发送循环次数 0表示无限循环 
+    "SYNCRS422TXchannels": [
+        {
+            "channel_id": 1, //通道id
+            "file_name": "file1.bin", //绑定的文件名称
+            "file_size": 5321, //绑定的文件大小（bytes）
+            "md5": "d41d8cd98f00b204e9800998ecf8427e", //绑定文件MD5
+            "chunk_size": 4260 //码片大小(bits) 
+        },
+        {
+            "channel_id": 2, //通道id
+            "file_name": "file2.bin", //绑定的文件名称
+            "file_size": 5321, //绑定的文件大小（bytes）
+            "md5": "d41d8cd98f00b204e9800998ecf8427e", //绑定文件MD5
+            "chunk_size": 4260//码片大小(bits) 
+        }
+    ]
+}

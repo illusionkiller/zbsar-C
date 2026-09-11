@@ -1,0 +1,6 @@
+*OneOfMessage.ver int_size:8
+*OneOfMessage.type int_size:8
+*OneOfMessage.crc16 int_size:16
+*SubMsg1.channel int_size:8
+*SubMsg2.channel int_size:8
+*SubMsg4.channel int_size:8
