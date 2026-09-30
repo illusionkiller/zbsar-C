@@ -2,6 +2,66 @@
 #include "FreeRTOS.h"
 #include "uartlite.h"
 #include "shell.h"
+s32 console_early_read(s32 fd, char8 *buf, s32 nbytes)
+{
+    if (fd != 0 || buf == NULL)
+    {
+        return -1;
+    }
+    s32 i;
+    s32 numbytes = 0;
+    char8 *LocalBuf = buf;
+
+    (void)fd;
+    if (LocalBuf != NULL)
+    {
+        for (i = 0; i < nbytes; i++)
+        {
+            numbytes++;
+            LocalBuf[i] = inbyte();
+            if ((LocalBuf[i] == '\n') || (LocalBuf[i] == '\r'))
+            {
+                break;
+            }
+        }
+    }
+
+    return nbytes;
+}
+
+sint32 console_early_write(sint32 fd, char8 *buf, sint32 nbytes)
+{
+    if ((fd != 1 && fd != 2) || buf == NULL)
+    {
+        return -1;
+    }
+    s32 i;
+    char8 *LocalBuf = buf;
+
+    for (i = 0; i < nbytes; i++)
+    {
+        if (LocalBuf != NULL)
+        {
+            LocalBuf += i;
+        }
+        if (LocalBuf != NULL)
+        {
+            if (*LocalBuf == '\n')
+            {
+                while (!uartlite_is_tx_empty());
+                outbyte('\r');
+            }
+            while (!uartlite_is_tx_empty());
+            outbyte(*LocalBuf);
+        }
+        if (LocalBuf != NULL)
+        {
+            LocalBuf -= i;
+        }
+    }
+
+    return nbytes;
+}
 
 static size_t uart_backend_read(console_backend_t *backend,
                                 char *buf,
@@ -41,8 +101,8 @@ static size_t uart_backend_write(console_backend_t *backend,
     return uartlite_write_blocking(buf, len, timeout);
     // for (size_t i = 0; i < len; i++)
     // {
-    //     while (!uartlite_is_tx_empty());
-    //     outbyte(buf[i]);
+        // while (!uartlite_is_tx_empty());
+        // outbyte(buf[i]);
     // }
     // return len;
 }

@@ -32,8 +32,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#define FIRMWARE_VERSION "release_v1.4"
-#define DEVICE_SN "PLDIUDJ-2607001"
+#define FIRMWARE_VERSION "release_v2.0"
+#define DEVICE_SN "ZBSAR-C"
 #define TEST_PARAM_FILE_NAME "test_params"
 #define TEST_CASE_FILE_NAME "test_case"
 // 环境变量文件路径

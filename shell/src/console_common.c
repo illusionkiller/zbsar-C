@@ -5,12 +5,11 @@
  */
 
 #include <sys/cdefs.h> // __containerof
+#include "console.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "../../shell/src/console.h"
-#include "../../shell/src/console_private.h"
-#include "../../shell/src/linenoise.h"
+#include "console_private.h"
+#include "linenoise.h"
 
 int esp_console_setup_prompt(const char *prompt, esp_console_repl_com_t *repl_com)
 {

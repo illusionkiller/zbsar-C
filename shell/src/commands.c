@@ -9,11 +9,10 @@
 #include <stdlib.h>
 #include <sys/param.h>
 #include <sys/queue.h>
+#include "console.h"
+#include "linenoise.h"
+#include "argtable3.h"
 #include <stdbool.h>
-
-#include "../../shell/src/argtable3.h"
-#include "../../shell/src/console.h"
-#include "../../shell/src/linenoise.h"
 #define ANSI_COLOR_DEFAULT      39      /** Default foreground color */
 
 typedef struct cmd_item_ {

@@ -103,8 +103,6 @@
  *
  */
 
-#include "../../shell/src/linenoise.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -118,12 +116,8 @@
 #include <sys/fcntl.h>
 #include <sys/time.h>
 #include <assert.h>
+#include "linenoise.h"
 
-#include "../../shell/src/console_backend.h"
-
-/* Keep linenoise I/O on the active console without overriding POSIX I/O. */
-#define read  shell_console_read
-#define write shell_console_write
 
 #define LINENOISE_DEFAULT_COLUMNS 80
 #define LINENOISE_DEFAULT_HISTORY_MAX_LEN 100

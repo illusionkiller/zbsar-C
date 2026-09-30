@@ -39,7 +39,6 @@ int uartlite_open(void);
 void uartlite_close(void);
 size_t uartlite_write_blocking(char *pcBuffer, size_t ulCount, TickType_t timeout);
 int uartlite_read_byte(TickType_t timeout, unsigned char *byte);
-size_t uartlite_rx_available(void);
 bool uartlite_is_tx_empty(void);
 
 #endif /* __UARTLITE_H_ */

@@ -30,12 +30,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "../../shell/src/argtable3.h"
+#include "argtable3.h"
 
 #ifndef ARG_AMALGAMATION
-#include "../../shell/src/argtable3_private.h"
+#include "argtable3_private.h"
 #if ARG_REPLACE_GETOPT == 1
-#include "../../shell/src/arg_getopt.h"
+#include "arg_getopt.h"
 #else
 #include <getopt.h>
 #endif

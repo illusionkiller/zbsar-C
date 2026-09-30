@@ -3,6 +3,13 @@
 	<name>test</name>
 	<comment>Created by Vitis v2023.1</comment>
 	<projects>
+		<project>cJson</project>
+		<project>lfs</project>
+		<project>libscpi</project>
+		<project>logc</project>
+		<project>nanopb</project>
+		<project>shell</project>
+		<project>tiny_crypt</project>
 		<project>ZBSAR_TOP</project>
 	</projects>
 	<buildSpec>

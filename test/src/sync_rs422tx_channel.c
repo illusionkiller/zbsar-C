@@ -2,9 +2,9 @@
 #include "queue.h"
 #include "message_buffer.h"
 #include "lwip/sys.h"
-#include "nanopb/pb_decode.h"
-#include "nanopb/dtu.pb.h"
-#include "nanopb/pb_encode.h"
+#include "pb_decode.h"
+#include "dtu.pb.h"
+#include "pb_encode.h"
 #include "vfs.h"
 #include "env.h"
 #include "dtu.h"
@@ -135,7 +135,7 @@ static int package_sync_rs422tx_channel_req_msg(sync_rs422tx_channel_t *channel,
     if (mode != BNC_GEN_MODE_SLAVE_PARALLEL)
     {
         gettimeofday(&tv, NULL);
-        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+//        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
     }
     msg->id = milliseconds;
     msg->values.submsg1.timestamp = milliseconds;
@@ -185,7 +185,7 @@ static int package_sync_rs422tx_channel_resp_msg(sync_rs422tx_channel_t *channel
     if (mode != BNC_GEN_MODE_SLAVE_PARALLEL)
     {
         gettimeofday(&tv, NULL);
-        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+//        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
     }
     msg->id = milliseconds;
     msg->values.submsg2.timestamp = milliseconds;
@@ -262,7 +262,7 @@ void sync_rs422tx_recv_thread(void *arg)
                 channel->event_callback(channel->user_data, SYNC_RS422TX_NOTIFY_SPI_DONE);
             }
 
-            if (channel->spi_bus->config.self_loop)
+            if (config.self_loop)
             {
                 uint8_t *data[4] = {recvdata[0], recvdata[1], recvdata[2], recvdata[3]};
                 int len = spi_pl_bus_recv(channel->spi_bus, data, SYNC_RS422TX_CHANNEL_MAX_RECV_SIZE);

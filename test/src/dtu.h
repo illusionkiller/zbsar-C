@@ -2,7 +2,7 @@
 #define DTU_H
 
 #include <stdint.h>
-#include "nanopb/dtu.pb.h"
+#include "dtu.pb.h"
 
 typedef int (*dtu_message_handler_t)(OneOfMessage *msg, void *user_data);
 

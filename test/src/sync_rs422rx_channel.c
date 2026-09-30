@@ -2,9 +2,9 @@
 #include "queue.h"
 #include "message_buffer.h"
 #include "lwip/sys.h"
-#include "nanopb/pb_decode.h"
-#include "nanopb/dtu.pb.h"
-#include "nanopb/pb_encode.h"
+#include "pb_decode.h"
+#include "dtu.pb.h"
+#include "pb_encode.h"
 #include "vfs.h"
 #include "env.h"
 #include "dtu.h"
@@ -69,7 +69,7 @@ static int package_sync_rs422rx_channel_req_msg(sync_rs422rx_channel_t *channel,
     if (mode != BNC_GEN_MODE_SLAVE_PARALLEL)
     {
         gettimeofday(&tv, NULL);
-        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+//        milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
     }
     msg->id = milliseconds;
     msg->values.submsg4.timestamp = milliseconds;

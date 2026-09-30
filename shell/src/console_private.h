@@ -8,11 +8,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
-#include "../../shell/src/console.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "console.h"
 
 #define CONSOLE_PROMPT_MAX_LEN (32)
 

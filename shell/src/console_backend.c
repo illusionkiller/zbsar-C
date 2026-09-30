@@ -1,6 +1,5 @@
-#include "../../shell/src/console_backend.h"
-
 #include <string.h>
+#include "console_backend.h"
 
 static console_backend_t *registered_backends[CONSOLE_BACKEND_MAX];
 static int backend_count = 0;
@@ -146,13 +145,18 @@ int shell_console_read(int fd, char *buf, size_t len)
         return -1;
     }
 
-    backend = console_backend_get_current();
-    if (backend == NULL || backend->ops == NULL || backend->ops->read == NULL) {
-        return -1;
-    }
-
     while (read_count < len) {
+        backend = console_backend_get_current();
+        if (backend == NULL || backend->ops == NULL || backend->ops->read == NULL) {
+            return read_count > 0U ? (int)read_count : -1;
+        }
+
         if (console_backend_read(backend, &buf[read_count], 1, pdMS_TO_TICKS(10)) == 0) {
+            continue;
+        }
+
+        /* Do not pass data from a backend that changed while it was blocking. */
+        if (backend != console_backend_get_current()) {
             continue;
         }
 

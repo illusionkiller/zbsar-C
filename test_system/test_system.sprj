@@ -9,6 +9,7 @@
       <applications name="lfs" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Debug"/>
       <applications name="tiny_crypt" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Debug"/>
       <applications name="cJson" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Debug"/>
+      <applications name="nanopb" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Debug"/>
       <options xsi:type="sdkproject:SdkOptions" generateSdCard="true"/>
     </configBuildOptions>
     <lastBuildOptions xsi:type="systemproject:SystemOptions">
@@ -25,6 +26,7 @@
       <applications name="lfs" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Release"/>
       <applications name="tiny_crypt" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Release"/>
       <applications name="cJson" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Release"/>
+      <applications name="nanopb" domainName="freertos10_xilinx_microblaze_0" domainPrettyName="freertos10_xilinx_microblaze_0" appBuildConfig="Release"/>
       <options xsi:type="sdkproject:SdkOptions" generateSdCard="true"/>
     </configBuildOptions>
   </configuration>

@@ -49,15 +49,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../../shell/src/argtable3.h"
+#include "argtable3.h"
 #ifndef ARG_AMALGAMATION
-#include "../../shell/src/argtable3_private.h"
+#include "argtable3_private.h"
 #endif
 
 #if ARG_REPLACE_GETOPT == 1
 
 #ifndef ARG_AMALGAMATION
-#include "../../shell/src/arg_getopt.h"
+#include "arg_getopt.h"
 #endif
 
 #include <errno.h>

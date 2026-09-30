@@ -38,7 +38,7 @@
 #include "lwip/sockets.h"
 #include "lwipopts.h"
 #include "dtu.h"
-#include "nanopb/pb_decode.h"
+#include "pb_decode.h"
 #include "log.h"
 
 extern struct netif net_interface;

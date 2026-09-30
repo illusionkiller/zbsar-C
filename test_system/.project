@@ -10,6 +10,7 @@
 		<project>lfs</project>
 		<project>tiny_crypt</project>
 		<project>cJson</project>
+		<project>nanopb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

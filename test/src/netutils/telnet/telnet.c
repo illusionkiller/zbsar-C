@@ -1,4 +1,6 @@
 #include <lwip/sockets.h>
+#include <lwip/errno.h>
+#include "xil_printf.h"
 #include "telnet.h"
 
 telnet_session_t telnet_session;
@@ -78,29 +80,26 @@ static void telnet_process_rx(const uint8_t *data, size_t length)
             break;
 
         case STATE_WILL:
-             if (c == TELNET_OPT_ECHO) {
-                 /* We want the server side to echo, not the client side. */
-                 send_option(s, TELNET_DONT, c);
-             } else if (c == TELNET_OPT_SGA) {
-                 send_option(s, TELNET_DO, c);
-             } else {
+             if (c != TELNET_OPT_SGA) {
+                 /* Refuse client options that this server does not consume. */
                  send_option(s, TELNET_DONT, c);
              }
-            s->state = STATE_NORMAL;
-            break;
+             s->state = STATE_NORMAL;
+             break;
 
         case STATE_WONT:
             s->state = STATE_NORMAL;
             break;
 
         case STATE_DO:
-             if (c == TELNET_OPT_ECHO || c == TELNET_OPT_SGA) {
-                 send_option(s, TELNET_WILL, c);
-             } else {
+             if (c != TELNET_OPT_ECHO && c != TELNET_OPT_SGA) {
                  send_option(s, TELNET_WONT, c);
              }
-            s->state = STATE_NORMAL;
-            break;
+             /* ECHO and SGA were offered by telnet_send_negotiate().  A DO
+              * is their acknowledgement, so replying WILL here would start
+              * an endless WILL/DO negotiation loop. */
+             s->state = STATE_NORMAL;
+             break;
 
         case STATE_DONT:
             s->state = STATE_NORMAL;

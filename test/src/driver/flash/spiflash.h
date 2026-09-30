@@ -31,6 +31,7 @@
 #define __SPIFLASH_H_
 
 #include "xil_types.h"
+#include <stdbool.h>
 
 #define SPI_FLASH_SECTOR_SIZE (64 * 1024) 
 #define SPI_FLASH_PAGE_SIZE 256
@@ -38,16 +39,20 @@
 
 #define QSPI_PARTITION_LFS_OFFSET 0x00100000 //
 #define QSPI_PARTITION_LFS_SIZE 0x00100000 // 1MB
+#define FLASH_READ_WRITE_RATE 100 // 1 Mbps
 
+typedef struct spiflash_dev spiflash_handle_t;
 
 void spi_flash_init(void);
-int flash_erase_sector(int dev_id, uint32_t addr);
-int flash_erase_block64K(int dev_id, uint32_t addr);
-int flash_erase_chip(int dev_id);
-int flash_soft_reset(int dev_id);
-int flash_read_id(int dev_id, uint8_t id_buf[2]);
-uint32_t flash_page_program(int dev_id, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
-uint32_t flash_read_data(int dev_id, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
-uint32_t flash_fast_read_data(int dev_id, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
+spiflash_handle_t *spiflash_get_handle(int dev_id);
+int flash_4B_addr_enable(spiflash_handle_t *flash, bool enable);
+int flash_erase_sector(spiflash_handle_t *flash, uint32_t addr);
+int flash_erase_block64K(spiflash_handle_t *flash, uint32_t addr);
+int flash_erase_chip(spiflash_handle_t *flash);
+int flash_soft_reset(spiflash_handle_t *flash);
+int flash_read_id(spiflash_handle_t *flash, uint8_t id_buf[2]);
+uint32_t flash_page_program(spiflash_handle_t *flash, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
+uint32_t flash_read_data(spiflash_handle_t *flash, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
+uint32_t flash_fast_read_data(spiflash_handle_t *flash, uint32_t addr, uint8_t *data, uint32_t size, uint32_t timeout_ms);
 void register_sf_commands(void);
 #endif /* __SPIFLASH_H_ */

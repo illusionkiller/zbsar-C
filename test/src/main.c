@@ -70,15 +70,14 @@ void main_thread(void *arg)
 {
 	set_system_time_to_compile_time();
 	init_cjson_heap_hooks();
+	uartlite_init();
 	pin_init();
 	fatfs_init();
 	lfs_init();
 	vfs_init();
 	log_init();
 	env_init();
-	log_info("FIRMWARE_VERSION: %s build: %s %s ,DEVICE_SN: %s", FIRMWARE_VERSION, __DATE__, __TIME__, DEVICE_SN);
 //driver
-	uartlite_init();
 	pwm_dev_init();
 	open_all_fans();
 	smi_switch_init();
@@ -105,6 +104,7 @@ void main_thread(void *arg)
 	register_iperf_commands();
 	register_test_case_commands();
 	console_init();
+	log_info("FIRMWARE_VERSION: %s build: %s %s ,DEVICE_SN: %s", FIRMWARE_VERSION, __DATE__, __TIME__, DEVICE_SN);
     vTaskDelete(NULL);
 }
 

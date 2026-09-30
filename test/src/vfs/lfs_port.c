@@ -8,15 +8,29 @@
 lfs_t lfs;
 lfs_file_t file;
 static xSemaphoreHandle lfs_mutex;
-#define FLASH_READ_WRITE_RATE 0x1000 // 1Mbpms
+static spiflash_handle_t *lfs_flash;
+
+
+static int lfs_block_range_valid(const struct lfs_config *c,
+                                 lfs_block_t block,
+                                 lfs_off_t off,
+                                 lfs_size_t size)
+{
+    return c != NULL && block < c->block_count && off <= c->block_size &&
+           size <= c->block_size - off;
+}
+
 static int user_provided_block_device_read(const struct lfs_config *c,
                                            lfs_block_t block,
                                            lfs_off_t off,
                                            void *buffer,
                                            lfs_size_t size)
 {
+    if (!lfs_block_range_valid(c, block, off, size) || (size != 0U && buffer == NULL))
+        return LFS_ERR_IO;
+
     uint32_t timeout_ms = size * 8 / FLASH_READ_WRITE_RATE + 1;
-    if (flash_fast_read_data(0,QSPI_PARTITION_LFS_OFFSET + block * c->block_size + off, buffer, size,timeout_ms) == size)
+    if (lfs_flash != NULL && flash_fast_read_data(lfs_flash, QSPI_PARTITION_LFS_OFFSET + block * c->block_size + off, buffer, size,timeout_ms) == size)
         return LFS_ERR_OK;
     return LFS_ERR_IO;
 }
@@ -28,16 +42,37 @@ static int user_provided_block_device_prog(const struct lfs_config *c,
                                            const void *buffer,
                                            lfs_size_t size)
 {
-	uint32_t timeout_ms = size * 8 / FLASH_READ_WRITE_RATE + 1;
-    if (flash_page_program(0,QSPI_PARTITION_LFS_OFFSET + block * c->block_size + off, (uint8_t *)buffer, size, timeout_ms) == size)
-        return LFS_ERR_OK;
-    return LFS_ERR_IO;
+    const uint8_t *data = buffer;
+    uint32_t addr;
+
+    if (!lfs_block_range_valid(c, block, off, size) || (size != 0U && buffer == NULL))
+        return LFS_ERR_IO;
+
+    addr = QSPI_PARTITION_LFS_OFFSET + block * c->block_size + off;
+    while (size != 0U)
+    {
+        uint32_t page_remaining = SPI_FLASH_PAGE_SIZE - (addr & (SPI_FLASH_PAGE_SIZE - 1U));
+        uint32_t write_size = size < page_remaining ? size : page_remaining;
+        uint32_t timeout_ms = write_size * 8 / FLASH_READ_WRITE_RATE + 1;
+
+        if (lfs_flash == NULL || flash_page_program(lfs_flash, addr, (uint8_t *)data, write_size, timeout_ms) != write_size)
+            return LFS_ERR_IO;
+
+        addr += write_size;
+        data += write_size;
+        size -= write_size;
+    }
+
+    return LFS_ERR_OK;
 }
 
 static int user_provided_block_device_erase(const struct lfs_config *c,
                                             lfs_block_t block)
 {
-    if (flash_erase_block64K(0,QSPI_PARTITION_LFS_OFFSET + block * c->block_size) == 0)
+    if (c == NULL || !lfs_block_range_valid(c, block, 0U, c->block_size))
+        return LFS_ERR_IO;
+
+    if (lfs_flash != NULL && flash_erase_block64K(lfs_flash, QSPI_PARTITION_LFS_OFFSET + block * c->block_size) == 0)
         return LFS_ERR_OK;
     return LFS_ERR_IO;
 }
@@ -75,11 +110,11 @@ const struct lfs_config cfg = {
 #endif
 
     // block device configuration
-    .read_size = 256,
-    .prog_size = 256,
-    .block_size = 1024*64,
-    .block_count = QSPI_PARTITION_LFS_SIZE / (1024*64), // 6MB for LFS partition
-    .cache_size = 1024*64,
+    .read_size = SPI_FLASH_PAGE_SIZE,
+    .prog_size = SPI_FLASH_PAGE_SIZE,
+    .block_size = SPI_FLASH_SECTOR_SIZE,
+    .block_count = QSPI_PARTITION_LFS_SIZE / SPI_FLASH_SECTOR_SIZE,
+    .cache_size = SPI_FLASH_PAGE_SIZE,
     .lookahead_size = 16,
     .block_cycles = 500,
 };
@@ -89,6 +124,12 @@ int lfs_init(void)
 {
     // mount the filesystem
     spi_flash_init();
+    lfs_flash = spiflash_get_handle(0);
+    if (lfs_flash == NULL)
+    {
+        printf("lfs: flash handle unavailable\r\n");
+        return LFS_ERR_IO;
+    }
     lfs_mutex = xSemaphoreCreateMutex();
     configASSERT(lfs_mutex != NULL);
     int err = lfs_mount(&lfs, &cfg);
@@ -96,8 +137,20 @@ int lfs_init(void)
     // this should only happen on the first boot
     if (err)
     {
-        lfs_format(&lfs, &cfg);
-        lfs_mount(&lfs, &cfg);
+        printf("lfs: mount failed: %d, formatting partition\r\n", err);
+        err = lfs_format(&lfs, &cfg);
+        if (err)
+        {
+            printf("lfs: format failed: %d\r\n", err);
+            return err;
+        }
+
+        err = lfs_mount(&lfs, &cfg);
+        if (err)
+        {
+            printf("lfs: mount after format failed: %d\r\n", err);
+            return err;
+        }
     }
 //
 //    // read current count
@@ -116,5 +169,6 @@ int lfs_init(void)
     // release any resources we were using
 //    lfs_unmount(&lfs);
 
-    return 0;
+    printf("lfs: mounted\r\n");
+    return LFS_ERR_OK;
 }

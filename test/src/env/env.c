@@ -1,10 +1,7 @@
 
-#include <log.h>
-#include "../../../test/src/env/env.h"
-
-#include "platform.h"
+#include <stdio.h>
+#include "env.h"
 #include "lfs.h"
-
 
 // LFS文件系统实例，从lfs_port.c中引用
 extern lfs_t lfs;
@@ -26,9 +23,6 @@ static void update_env_cache(void);
  */
 int env_init(void)
 {
-    extern int lfs_init(void);
-    lfs_init();
-
     // 先设置默认环境变量
     int i;
     for (i = 0; i < sizeof(default_env_vars) / sizeof(default_env_vars[0]); i++)
@@ -164,7 +158,7 @@ static void update_env_cache(void)
     // 分配新缓存
     env_cache = (char **)pvPortMalloc(sizeof(char *) * count);
     if (env_cache == NULL) {
-        log_error("Failed to allocate env cache");
+        printf("env: failed to allocate cache\r\n");
         return;
     }
     
@@ -176,7 +170,7 @@ static void update_env_cache(void)
     while ((line = env_iter_next_full(&iter)) != NULL) {
         env_cache[count] = strdup(line);
         if (env_cache[count] == NULL) {
-            log_error("Failed to duplicate env line");
+            printf("env: failed to duplicate cache entry\r\n");
             free_env_cache();
             return;
         }
@@ -234,18 +228,18 @@ int env_save(void)
     
     // 检查环境变量是否发生变化
     if (!is_env_changed()) {
-        log_info("Environment variables unchanged, skipping save");
+        printf("env: variables unchanged, skipping save\r\n");
         return 0;
     }
     
     // 有变化，执行写入操作
-    log_info("Environment variables changed, saving to LFS");
+    printf("env: variables changed, saving to LFS\r\n");
     
     // 打开文件，创建或截断
     err = lfs_file_open(&lfs, &file, ENV_FILE_PATH, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
     if (err)
     {
-        log_error("Failed to open environment file for writing: %d", err);
+        printf("env: failed to open file for writing: %d\r\n", err);
         return err;
     }
 
@@ -256,7 +250,7 @@ int env_save(void)
         lfs_ssize_t written = lfs_file_write(&lfs, &file, line, strlen(line));
         if (written < 0)
         {
-            log_error("Failed to write environment variable to file: %d", written);
+            printf("env: failed to write variable: %d\r\n", (int)written);
             lfs_file_close(&lfs, &file);
             return written;
         }
@@ -264,7 +258,7 @@ int env_save(void)
         written = lfs_file_write(&lfs, &file, "\n", 1);
         if (written < 0)
         {
-            log_error("Failed to write newline to environment file: %d", written);
+            printf("env: failed to write newline: %d\r\n", (int)written);
             lfs_file_close(&lfs, &file);
             return written;
         }
@@ -274,14 +268,14 @@ int env_save(void)
     err = lfs_file_close(&lfs, &file);
     if (err)
     {
-        log_error("Failed to close environment file: %d", err);
+        printf("env: failed to close file: %d\r\n", err);
         return err;
     }
 
     // 更新环境变量缓存
     update_env_cache();
     
-    log_info("Environment variables saved to LFS");
+    printf("env: variables saved to LFS\r\n");
     return 0;
 }
 
@@ -300,10 +294,10 @@ int env_load(void)
     {
         if (err == LFS_ERR_NOENT)
         {
-            log_info("Environment file not found");
+            printf("env: file not found\r\n");
             return -1;
         }
-        log_error("Failed to open environment file for reading: %d", err);
+        printf("env: failed to open file for reading: %d\r\n", err);
         return err;
     }
 
@@ -315,7 +309,7 @@ int env_load(void)
     lfs_ssize_t read = lfs_file_read(&lfs, &file, buffer, sizeof(buffer) - 1);
     if (read < 0)
     {
-        log_error("Failed to read environment file: %d", read);
+        printf("env: failed to read file: %d\r\n", (int)read);
         lfs_file_close(&lfs, &file);
         return read;
     }
@@ -339,14 +333,14 @@ int env_load(void)
     err = lfs_file_close(&lfs, &file);
     if (err)
     {
-        log_error("Failed to close environment file: %d", err);
+        printf("env: failed to close file: %d\r\n", err);
         return err;
     }
     
     // 加载后更新缓存
     update_env_cache();
 
-    log_info("Environment variables loaded from LFS");
+    printf("env: variables loaded from LFS\r\n");
     return 0;
 }
 
@@ -401,7 +395,7 @@ int env_clean(void)
             // 确保键名长度不超过缓冲区大小
             if (key_len >= sizeof(key_buf))
             {
-                log_error("Environment variable key too long");
+                printf("env: variable key too long\r\n");
                 continue;
             }
             
@@ -418,14 +412,14 @@ int env_clean(void)
     err = lfs_remove(&lfs, ENV_FILE_PATH);
     if (err && err != LFS_ERR_NOENT)
     {
-        log_error("Failed to remove environment file: %d", err);
+        printf("env: failed to remove file: %d\r\n", err);
         return err;
     }
     
     // 清除后更新缓存
     update_env_cache();
 
-    log_info("Environment variables cleaned successfully");
+    printf("env: variables cleaned\r\n");
     return 0;
 }
 
@@ -448,6 +442,6 @@ int env_restore_default(void)
     // 恢复后更新缓存
     update_env_cache();
 
-    log_info("Environment variables restored to default values");
+    printf("env: default variables restored\r\n");
     return 0;
 }

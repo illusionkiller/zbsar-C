@@ -122,7 +122,15 @@ typedef struct
     volatile u32 PULSE_NUM; /*address offset:0x0080                                                  */
 } SPI_Handle_Def;
 
-
+struct spi_pl_bus
+{
+    int id;
+    int irq;
+    u32 base_addr;
+    spi_pl_config_t config;
+    void (*callback)(void *user_data, u32 event);
+    void *user_data;
+};
 
 static void spi_pl_bus_irq_handler(void *para)
 {

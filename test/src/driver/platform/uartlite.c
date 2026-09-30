@@ -6,8 +6,7 @@ extern XIntc XIntcInstance;
 
 #define UARTLITE_DEVICE_ID XPAR_UARTLITE_0_DEVICE_ID
 #define UARTLITE_INT_IRQ_ID XPAR_AXI_INTC_0_AXI_UARTLITE_0_INTERRUPT_INTR
-#define UARTLITE_RING_BUFFER_SIZE 4096U
-#define UARTLITE_RX_CHUNK_SIZE 1U   //console use must be 1
+#define UARTLITE_RING_BUFFER_SIZE 1024U
 
 typedef struct
 {
@@ -24,7 +23,7 @@ typedef struct
     bool opened;
     XUartLite instance;
     uartlite_ring_t rx_ring;
-    uint8_t rx_chunk[UARTLITE_RX_CHUNK_SIZE];
+    uint8_t cur_rx_byte;
     SemaphoreHandle_t rx_sem;
 } uartlite_device_t;
 
@@ -35,41 +34,51 @@ static uartlite_device_t uartlite_device = {
 
 static void uartlite_ring_flush(uartlite_ring_t *ring)
 {
-    ring->head = 0U;
-    ring->tail = 0U;
+    ring->head = ring->tail = 0;
 }
 
-static size_t uartlite_ring_write(uartlite_ring_t *ring,
-                                  const uint8_t *data,
-                                  size_t len)
+// static size_t uartlite_ring_write(uartlite_ring_t *ring,
+//                                 const uint8_t *data,
+//                                 size_t len)
+// {
+//     size_t written = 0U;
+
+//     while (written < len)
+//     {
+//         size_t next = (ring->head + 1U) % UARTLITE_RING_BUFFER_SIZE;
+//         if (next == ring->tail)
+//         {
+//             break;
+//         }
+//         ring->data[ring->head] = data[written++];
+//         ring->head = next;
+//     }
+//     return written;
+// }
+static size_t uartlite_ring_put(uartlite_ring_t *ring,
+                                const uint8_t data)
 {
-    size_t written = 0U;
+    size_t next;
 
-    while (written < len)
+    if (ring == NULL)
     {
-        size_t next = (ring->head + 1U) % UARTLITE_RING_BUFFER_SIZE;
-        if (next == ring->tail)
-        {
-            break;
-        }
-        ring->data[ring->head] = data[written++];
-        ring->head = next;
+        return 0U;
     }
-    return written;
-}
 
-static size_t uartlite_ring_read(uartlite_ring_t *ring,
-                                 uint8_t *data,
-                                 size_t len)
-{
-    size_t read = 0U;
-
-    while (read < len && ring->tail != ring->head)
+    next = ring->head + 1U;
+    if (next >= UARTLITE_RING_BUFFER_SIZE)
     {
-        data[read++] = ring->data[ring->tail];
-        ring->tail = (ring->tail + 1U) % UARTLITE_RING_BUFFER_SIZE;
+        next = 0U;
     }
-    return read;
+
+    if (next == ring->tail)
+    {
+        return 0U;
+    }
+
+    ring->data[ring->head] = data;
+    ring->head = next;
+    return 1U;
 }
 
 static size_t uartlite_ring_available(const uartlite_ring_t *ring)
@@ -81,45 +90,79 @@ static size_t uartlite_ring_available(const uartlite_ring_t *ring)
     return UARTLITE_RING_BUFFER_SIZE - ring->tail + ring->head;
 }
 
+// static size_t uartlite_ring_read(uartlite_ring_t *ring,
+//                                  uint8_t *data,
+//                                  size_t len)
+// {
+//     size_t read = 0U;
+
+//     while (read < len && ring->tail != ring->head)
+//     {
+//         data[read++] = ring->data[ring->tail];
+//         ring->tail = (ring->tail + 1U) % UARTLITE_RING_BUFFER_SIZE;
+//     }
+//     return read;
+// }
+
+static size_t uartlite_ring_read(uartlite_ring_t *ring, uint8_t *data, size_t max_len)
+{
+    size_t bytes_available, bytes_to_read, contiguous;
+    //	size_t bytes_read = 0;
+
+    if (ring == NULL)
+        return 0;
+
+    bytes_available = uartlite_ring_available(ring);
+
+    if (bytes_available == 0)
+        return 0;
+
+    bytes_to_read = (bytes_available > max_len) ? max_len : bytes_available;
+
+    contiguous = UARTLITE_RING_BUFFER_SIZE - ring->tail;
+    if (bytes_to_read > contiguous)
+    {
+        memcpy(data, ring->data + ring->tail, contiguous);
+        memcpy(data + contiguous, ring->data, bytes_to_read - contiguous);
+        ring->tail = bytes_to_read - contiguous;
+    }
+    else
+    {
+        memcpy(data, ring->data + ring->tail, bytes_to_read);
+        ring->tail = (ring->tail + bytes_to_read) % UARTLITE_RING_BUFFER_SIZE;
+        // if (ring->tail >= UARTLITE_RING_BUFFER_SIZE)
+        // {
+        // 	ring->tail = 0;
+        // }
+    }
+
+    return bytes_to_read;
+}
+
 static void uartlite_arm_receive(uartlite_device_t *device)
 {
-    (void)XUartLite_Recv(&device->instance,
-                         device->rx_chunk,
-                         sizeof(device->rx_chunk));
+    XUartLite_Recv(&device->instance, &device->cur_rx_byte, 1);
 }
 
 static void uartlite_recv_handler(void *callback_ref, unsigned int event_data)
 {
     uartlite_device_t *device = (uartlite_device_t *)callback_ref;
-    size_t received;
-    size_t written;
     BaseType_t task_woken = pdFALSE;
+    size_t written;
 
+    (void)event_data;
+    /* UARTLite receive requests are one-shot; arm the next request. */
+    uartlite_arm_receive(device);
     if (device == NULL || !device->opened)
     {
         return;
     }
-
-    received = event_data;
-    if (received > sizeof(device->rx_chunk))
+    written = uartlite_ring_put(&device->rx_ring, device->cur_rx_byte);
+    if (written != 0U && device->rx_sem != NULL)
     {
-        received = sizeof(device->rx_chunk);
+        (void)xSemaphoreGiveFromISR(device->rx_sem, &task_woken);
+        // portYIELD_FROM_ISR(task_woken);
     }
-    written = uartlite_ring_write(&device->rx_ring,
-                                  device->rx_chunk,
-                                  received);
-
-    while (written-- > 0U)
-    {
-        if (device->rx_sem != NULL)
-        {
-            (void)xSemaphoreGiveFromISR(device->rx_sem, &task_woken);
-        }
-    }
-
-    /* UARTLite receive requests are one-shot; arm the next request. */
-    uartlite_arm_receive(device);
-    portYIELD_FROM_ISR(task_woken);
 }
 
 static void uartlite_send_handler(void *callback_ref, unsigned int event_data)
@@ -168,8 +211,7 @@ int uartlite_init(void)
     }
     if (uartlite_device.rx_sem == NULL)
     {
-        uartlite_device.rx_sem = xSemaphoreCreateCounting(
-            UARTLITE_RING_BUFFER_SIZE, 0U);
+        uartlite_device.rx_sem = xSemaphoreCreateBinary();
         if (uartlite_device.rx_sem == NULL)
         {
             return -1;
@@ -185,9 +227,7 @@ int uartlite_open(void)
         return -1;
     }
     uartlite_ring_flush(&uartlite_device.rx_ring);
-    while (xSemaphoreTake(uartlite_device.rx_sem, 0U) == pdTRUE)
-    {
-    }
+    (void)xSemaphoreTake(uartlite_device.rx_sem, 0U);
     XUartLite_ResetFifos(&uartlite_device.instance);
     uartlite_device.opened = true;
     uartlite_arm_receive(&uartlite_device);
@@ -248,11 +288,6 @@ size_t uartlite_write_blocking(char *buffer, size_t length, TickType_t timeout)
         taskYIELD();
     }
     return sent;
-}
-
-size_t uartlite_rx_available(void)
-{
-    return uartlite_ring_available(&uartlite_device.rx_ring);
 }
 
 bool uartlite_is_tx_empty(void)

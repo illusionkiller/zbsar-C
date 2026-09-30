@@ -23,15 +23,8 @@ typedef struct
     bool self_loop;
 } spi_pl_config_t;
 
-typedef struct
-{
-    int id;
-    int irq;
-    u32 base_addr;
-    spi_pl_config_t config;
-    void (*callback)(void *user_data, u32 event);
-    void *user_data;
-} spi_pl_bus_t;
+typedef struct spi_pl_bus spi_pl_bus_t;
+
 #define SPI_PL_FIFO_DEPTH (30 * 533)
 #define SPI_PL_RECV_FIFO_DEPTH (1024)
 #define SPI_PL_BUS_EVENT_TRANSFER_DONE 0   //BIT0
@@ -48,8 +41,8 @@ typedef struct
     .self_loop = false       \
 }
 
-/************************** Function Prototypes ****************************/
-void spi_pl_bus_select(spi_pl_bus_t *bus, u8 Chip_Sel);
+    /************************** Function Prototypes ****************************/
+    void spi_pl_bus_select(spi_pl_bus_t *bus, u8 Chip_Sel);
 void spi_pl_bus_bind_irq_callback(spi_pl_bus_t *bus, void (*callback)(void *user_data, u32 event),void *user_data);
 void spi_pl_bus_enable(spi_pl_bus_t *bus, bool enable);
 void spi_pl_bus_reset_fifo(spi_pl_bus_t *bus);

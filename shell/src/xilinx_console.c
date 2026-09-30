@@ -7,13 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "../../shell/src/console_private.h"
-#include "../../shell/src/linenoise.h"
-#include "../../shell/src/shell.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "console_private.h"
+#include "linenoise.h"
+#include "shell.h"
 
 static esp_console_repl_t *s_repl;
 

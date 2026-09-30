@@ -1,9 +1,9 @@
 ﻿#include "bnc_channel.h"
 #include "queue.h"
 #include "message_buffer.h"
-#include "nanopb/pb_decode.h"
-#include "nanopb/dtu.pb.h"
-#include "nanopb/pb_encode.h"
+#include "pb_decode.h"
+#include "dtu.pb.h"
+#include "pb_encode.h"
 #include "vfs.h"
 #include "env.h"
 #include "dtu.h"
@@ -130,7 +130,8 @@ int package_bnc_channel_resp_msg(bnc_channel_t *channel, uint32_t message_id, in
     msg->type = ChannelType_BNC;
     msg->which_values = OneOfMessage_submsg2_tag;
     gettimeofday(&tv, NULL);
-    long long milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+//    long long milliseconds = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+    long long milliseconds = 0;
     msg->id = milliseconds;
     msg->values.submsg2.timestamp = milliseconds;
     msg->values.submsg2.channel = channel->id;

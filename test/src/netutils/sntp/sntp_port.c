@@ -11,8 +11,16 @@
 #include "env.h"
 
 #define DEFAULT_NTP_SERVER_IP "192.168.1.215"
-static uint64_t local_time_us = 0;
+#define USE_FREERTOS_TIMER
+
+#ifdef USE_FREERTOS_TIMER 
 static TimerHandle_t xTimer = NULL;
+static uint64_t local_time_us = 0;
+static uint32_t local_tick_time = 1;
+#else
+#include "xtime_l.h"
+static    XTime tCur = 0;
+#endif
 int gettimeofday(struct timeval *tv, void *tzvp)
 {
     (void)tzvp; // unused
@@ -20,22 +28,45 @@ int gettimeofday(struct timeval *tv, void *tzvp)
     // TickType_t ticks = xTaskGetTickCount();
     // tv->tv_sec = ticks / configTICK_RATE_HZ;
 //    tv->tv_usec = (ticks % configTICK_RATE_HZ) * (1000000 / configTICK_RATE_HZ);
+#ifdef USE_FREERTOS_TIMER
     tv->tv_sec = local_time_us / 1000000;
     tv->tv_usec = local_time_us % 1000000;
-//    XTime tCur = 0;
-//    XTime_GetTime(&tCur);
-//    tv->tv_sec = tCur / COUNTS_PER_SECOND;
-//    tv->tv_usec = (tCur % COUNTS_PER_SECOND) * 1000000 / COUNTS_PER_SECOND;
+#else
+    XTime tCur = 0;
+    XTime_GetTime(&tCur);
+    tv->tv_sec = tCur / COUNTS_PER_SECOND;
+    tv->tv_usec = (tCur % COUNTS_PER_SECOND) * 1000000 / COUNTS_PER_SECOND;
+#endif
+    return 0;
+}
 
+int _gettimeofday(struct timeval *tv, void *tzvp)
+{
+    (void)tzvp; // unused
+
+    // TickType_t ticks = xTaskGetTickCount();
+    // tv->tv_sec = ticks / configTICK_RATE_HZ;
+//    tv->tv_usec = (ticks % configTICK_RATE_HZ) * (1000000 / configTICK_RATE_HZ);
+#ifdef USE_FREERTOS_TIMER
+    tv->tv_sec = local_time_us / 1000000;
+    tv->tv_usec = local_time_us % 1000000;
+#else
+    XTime tCur = 0;
+    XTime_GetTime(&tCur);
+    tv->tv_sec = tCur / COUNTS_PER_SECOND;
+    tv->tv_usec = (tCur % COUNTS_PER_SECOND) * 1000000 / COUNTS_PER_SECOND;
+#endif
     return 0;
 }
 
 int settimeofday (const struct timeval *tv, const struct timezone *tz)
 {
+#ifdef USE_FREERTOS_TIMER
     local_time_us = tv->tv_sec * 1000000 + tv->tv_usec;
-//    XTime tCur = 0;
-//    tCur = tv->tv_sec * COUNTS_PER_SECOND + tv->tv_usec * COUNTS_PER_SECOND / 1000000;
-//    XTime_SetTime(tCur);
+#else
+    tCur = tv->tv_sec * COUNTS_PER_SECOND + tv->tv_usec * COUNTS_PER_SECOND / 1000000;
+    XTime_SetTime(tCur);
+#endif
     return 0;
 }
 
@@ -45,9 +76,11 @@ void sntp_set_system_time_us(uint32_t sec, uint32_t us)
     settimeofday(&tv, NULL);
 }
 
+#ifdef USE_FREERTOS_TIMER
 void TimerCallback(TimerHandle_t xTimer) {
-	local_time_us += 10000;
+    local_time_us += local_tick_time  * 1000; // 1 tick to us
 }
+#endif
 
 void sntp_client_init(void)
 {
@@ -65,12 +98,15 @@ void sntp_client_init(void)
 	// 将时区设置为中国标准时间
 	setenv("TZ", "CST-8", 1);
 	tzset();
+#ifdef USE_FREERTOS_TIMER
     //启动一个ms定时器
     if(xTimer == NULL)
     {
-        xTimer = xTimerCreate("Timer",pdMS_TO_TICKS(10),pdTRUE, (void *)0, TimerCallback ); //tick=10ms
+        local_tick_time = portTICK_PERIOD_MS;
+        xTimer = xTimerCreate("Timer",1,pdTRUE, (void *)0, TimerCallback ); 
         xTimerStart(xTimer, 0);
     }
+#endif
 }
 
 void set_system_time_to_compile_time(void)

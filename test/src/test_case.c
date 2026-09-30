@@ -712,7 +712,9 @@ void test_case_manager_send_parallel_file_mode(test_case_manager_t *manager)
                 if (test_channel && test_channel->valid && test_channel->channel_handle)
                 {
                     test_channel->current_chunk_index += TEST_CASE_MIN_CHUNK_COUNT;
-                    if (test_channel->channel_handle->spi_bus->config.self_loop) // debug loop
+                    spi_pl_config_t config= {0};
+                    spi_pl_bus_get_config(test_channel->channel_handle->spi_bus,&config);
+                    if (config.self_loop) // debug loop
                     {
                         xTaskNotify(test_channel->channel_handle->recv_thread,
                                     SYNC_RS422TX_NOTIFY_SPI_DONE,
@@ -791,7 +793,9 @@ void test_case_manager_send_parallel_chunk_mode(test_case_manager_t *manager)
                     if (test_channel && test_channel->valid && test_channel->channel_handle)
                     {
                         test_channel->current_chunk_index += TEST_CASE_MIN_CHUNK_COUNT;
-                        if (test_channel->channel_handle->spi_bus->config.self_loop) // debug loop
+                        spi_pl_config_t config= {0};
+                        spi_pl_bus_get_config(test_channel->channel_handle->spi_bus,&config);
+                        if (config.self_loop) // debug loop
                         {
                             xTaskNotify(test_channel->channel_handle->recv_thread,
                                         SYNC_RS422TX_NOTIFY_SPI_DONE,

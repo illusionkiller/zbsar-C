@@ -61,7 +61,12 @@ void print_flash_hex(uint16_t address, uint8_t *buffer, size_t size)
    }
 }
 
-static u32 flash_write(int dev_id, u32 addr, u8 *data, u32 size, TickType_t timeout)
+static u32 flash_transfer_timeout_ms(u32 size)
+{
+   return size * 8U / FLASH_READ_WRITE_RATE + 1U;
+}
+
+static u32 flash_write(spiflash_handle_t *flash, u32 addr, u8 *data, u32 size)
 {
    u32 written = 0;
    while (written < size)
@@ -71,7 +76,8 @@ static u32 flash_write(int dev_id, u32 addr, u8 *data, u32 size, TickType_t time
        {
            write_size = size - written;
        }
-       u32 ret_size = flash_page_program(dev_id, addr, &data[written], write_size, timeout);
+       u32 ret_size = flash_page_program(flash, addr, &data[written], write_size,
+                                         flash_transfer_timeout_ms(write_size));
        if (ret_size == 0)
        {
            break;
@@ -82,6 +88,27 @@ static u32 flash_write(int dev_id, u32 addr, u8 *data, u32 size, TickType_t time
    return written;
 }
 
+static u32 flash_read(spiflash_handle_t *flash, u32 addr, u8 *data, u32 size)
+{
+   u32 read_total = 0;
+
+   while (read_total < size)
+   {
+      u32 read_size = size - read_total;
+      if (read_size > SPI_FLASH_SECTOR_SIZE)
+          read_size = SPI_FLASH_SECTOR_SIZE;
+
+      u32 ret_size = flash_fast_read_data(flash, addr + read_total,
+                                           &data[read_total], read_size,
+                                           flash_transfer_timeout_ms(read_size));
+      if (ret_size != read_size)
+          break;
+      read_total += ret_size;
+   }
+
+   return read_total;
+}
+
 static int sf_cmd_handler(int argc, char **argv)
 {
    int nerrors = arg_parse(argc, argv, (void **)&qspi_flash_args);
@@ -90,13 +117,19 @@ static int sf_cmd_handler(int argc, char **argv)
        arg_print_errors(stderr, qspi_flash_args.end, argv[0]);
        return 1;
    }
-   int dev_id = qspi_flash_args.dev->count ? qspi_flash_args.dev->ival[0] : 0;
+    int dev_id = qspi_flash_args.dev->count ? qspi_flash_args.dev->ival[0] : 0;
+    spiflash_handle_t *flash = spiflash_get_handle(dev_id);
+    if (flash == NULL)
+    {
+        printf("invalid flash device id: %d\n", dev_id);
+        return 1;
+    }
    if (qspi_flash_args.mode->count)
    {
        if (strcmp(qspi_flash_args.mode->sval[0], "eraseall") == 0)
            {
                TickType_t start_time = xTaskGetTickCount();
-               int ret = flash_erase_chip(dev_id);
+                int ret = flash_erase_chip(flash);
                TickType_t end_time = xTaskGetTickCount();
                if (ret == 0)
                {
@@ -109,9 +142,14 @@ static int sf_cmd_handler(int argc, char **argv)
            }
        else if (strcmp(qspi_flash_args.mode->sval[0], "benchmark") == 0)
        {
-           const u32 test_size = 1024 * 1024; // 1MB
-           const u32 test_addr = 1024 * 1024;
-           uint8_t *write_data = pvPortMalloc(test_size);
+            const u32 test_size = 1024 * 1024; // 1MB
+            const u32 test_addr = QSPI_PARTITION_LFS_OFFSET + QSPI_PARTITION_LFS_SIZE;
+            const u32 test_end = test_addr + test_size;
+             const u32 erase_count = (test_size + SPI_FLASH_SECTOR_SIZE - 1U) /
+                                     SPI_FLASH_SECTOR_SIZE;
+             const u32 erase_timeout_ms = 10000U;
+             const u32 read_timeout_ms = flash_transfer_timeout_ms(SPI_FLASH_SECTOR_SIZE);
+            uint8_t *write_data = pvPortMalloc(test_size);
            uint8_t *read_data = pvPortMalloc(test_size);
 
            if (write_data == NULL || read_data == NULL)
@@ -124,15 +162,31 @@ static int sf_cmd_handler(int argc, char **argv)
                return 1;
            }
 
-           //erase
-           TickType_t start_time = xTaskGetTickCount();
-           u32 sector_count = (test_size) / (1024 * 64);
-           for (u32 i = 0; i < sector_count; i++)
-           {
-        	   flash_erase_block64K(dev_id, test_addr + i * 1024 * 64);
-           }
-           TickType_t end_time = xTaskGetTickCount();
-           printf("erase %lu bytes take %lu ms\n", test_size, (end_time - start_time) * portTICK_PERIOD_MS);
+            printf("benchmark erase region: [0x%08lx, 0x%08lx), size=%lu bytes\n",
+                   (unsigned long)test_addr, (unsigned long)test_end,
+                   (unsigned long)test_size);
+            printf("benchmark write region: [0x%08lx, 0x%08lx), size=%lu bytes\n",
+                   (unsigned long)test_addr, (unsigned long)test_end,
+                   (unsigned long)test_size);
+            printf("benchmark read region:  [0x%08lx, 0x%08lx), size=%lu bytes\n",
+                   (unsigned long)test_addr, (unsigned long)test_end,
+                   (unsigned long)test_size);
+
+            // erase
+            TickType_t start_time = xTaskGetTickCount();
+            int erase_ret = 0;
+            for (u32 i = 0; i < erase_count; i++)
+            {
+               erase_ret = flash_erase_block64K(flash,
+                                                 test_addr + i * SPI_FLASH_SECTOR_SIZE);
+               if (erase_ret != 0)
+                   break;
+            }
+            TickType_t end_time = xTaskGetTickCount();
+            printf("erase %lu bytes (%lu blocks) take %lu ms, timeout=%lu ms, ret=%d\n",
+                   (unsigned long)test_size, (unsigned long)erase_count,
+                   (unsigned long)((end_time - start_time) * portTICK_PERIOD_MS),
+                   (unsigned long)(erase_count * erase_timeout_ms), erase_ret);
 
            //write
            for (u32 i = 0; i < test_size; i++)
@@ -140,17 +194,26 @@ static int sf_cmd_handler(int argc, char **argv)
                write_data[i] = (uint8_t)(i & 0xFF);
            }
            start_time = xTaskGetTickCount();
-           flash_write(dev_id, test_addr, write_data, test_size, 5000);
-           end_time = xTaskGetTickCount();
-           printf("write %lu bytes take %lu ms\n", test_size, (end_time - start_time) * portTICK_PERIOD_MS);
+            u32 written = flash_write(flash, test_addr, write_data, test_size);
+            end_time = xTaskGetTickCount();
+            printf("write region [0x%08lx, 0x%08lx), %lu/%lu bytes take %lu ms, timeout=%lu ms\n",
+                   (unsigned long)test_addr, (unsigned long)test_end,
+                   (unsigned long)written, (unsigned long)test_size,
+                   (unsigned long)((end_time - start_time) * portTICK_PERIOD_MS),
+                   (unsigned long)flash_transfer_timeout_ms(SPI_FLASH_PAGE_SIZE));
 
            //read
            start_time = xTaskGetTickCount();
-           flash_fast_read_data(dev_id, test_addr, read_data, test_size, 10000);
-           end_time = xTaskGetTickCount();
-           printf("read %lu bytes take %lu ms\n", test_size, (end_time - start_time) * portTICK_PERIOD_MS);
+            u32 read_size = flash_read(flash, test_addr, read_data, test_size);
+            end_time = xTaskGetTickCount();
+            printf("read region [0x%08lx, 0x%08lx), %lu/%lu bytes take %lu ms, timeout=%lu ms\n",
+                   (unsigned long)test_addr, (unsigned long)test_end,
+                   (unsigned long)read_size, (unsigned long)test_size,
+                   (unsigned long)((end_time - start_time) * portTICK_PERIOD_MS),
+                   (unsigned long)read_timeout_ms);
            //verify
-           if (memcmp(write_data, read_data, test_size) == 0)
+            if (erase_ret == 0 && written == test_size && read_size == test_size &&
+                memcmp(write_data, read_data, test_size) == 0)
            {
                printf("benchmark success: read data match written data\n");
            }
@@ -170,7 +233,7 @@ static int sf_cmd_handler(int argc, char **argv)
            }
            uint8_t *data = pvPortMalloc(qspi_flash_args.size->ival[0]);
            // sfud_read(flash, qspi_flash_args.offset->ival[0], qspi_flash_args.size->ival[0], data);
-           flash_read_data(dev_id, qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0], 100);
+            flash_read_data(flash, qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0], flash_transfer_timeout_ms(qspi_flash_args.size->ival[0]));
            print_flash_hex(qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0]);
            vPortFree(data);
        }
@@ -187,7 +250,7 @@ static int sf_cmd_handler(int argc, char **argv)
                printf("memory allocation failed\n");
                return 1;
            }
-           flash_fast_read_data(dev_id, qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0], 100);
+            flash_fast_read_data(flash, qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0], flash_transfer_timeout_ms(qspi_flash_args.size->ival[0]));
            print_flash_hex(qspi_flash_args.offset->ival[0], data, qspi_flash_args.size->ival[0]);
            vPortFree(data);
        }
@@ -198,11 +261,11 @@ static int sf_cmd_handler(int argc, char **argv)
                printf("write offset or data is not set\n");
                return 1;
            }
-           flash_page_program(dev_id, qspi_flash_args.offset->ival[0], (u8 *)qspi_flash_args.data->sval[0], strlen(qspi_flash_args.data->sval[0]), 100);
+            flash_page_program(flash, qspi_flash_args.offset->ival[0], (u8 *)qspi_flash_args.data->sval[0], strlen(qspi_flash_args.data->sval[0]), flash_transfer_timeout_ms(strlen(qspi_flash_args.data->sval[0])));
        }
        else if (strcmp(qspi_flash_args.mode->sval[0], "erase") == 0)
        {
-    	   flash_erase_block64K(dev_id, qspi_flash_args.offset->ival[0]);
+           flash_erase_block64K(flash, qspi_flash_args.offset->ival[0]);
        }
        else
        {
