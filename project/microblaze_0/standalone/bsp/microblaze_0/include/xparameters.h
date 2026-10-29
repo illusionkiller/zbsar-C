@@ -819,6 +819,11 @@
 #define XPAR_OE_HIGHADDR 0x4502FFFF
 
 
+/* Peripheral Definitions for peripheral BNC_GEN_0 */
+#define XPAR_BNC_GEN_0_BASEADDR 0x44BD0000
+#define XPAR_BNC_GEN_0_HIGHADDR 0x44BDFFFF
+
+
 /* Peripheral Definitions for peripheral PULSE_GEN_0 */
 #define XPAR_PULSE_GEN_0_BASEADDR 0x44BF0000
 #define XPAR_PULSE_GEN_0_HIGHADDR 0x44BFFFFF
@@ -879,11 +884,6 @@
 #define XPAR_SPI_SLAVE_5_HIGHADDR 0x44ABFFFF
 
 
-/* Peripheral Definitions for peripheral BNC_GEN_0 */
-#define XPAR_BNC_GEN_0_BASEADDR 0x44BD0000
-#define XPAR_BNC_GEN_0_HIGHADDR 0x44BDFFFF
-
-
 /******************************************************************/
 
 
@@ -902,6 +902,8 @@
 /* Canonical Definitions for peripheral OE */
 #define XPAR_PWM_2_BASEADDR 0x45020000
 #define XPAR_PWM_2_HIGHADDR 0x4502FFFF
+
+
 
 
 
@@ -927,8 +929,6 @@
 /* Canonical Definitions for peripheral SPI_SLAVE_1 */
 #define XPAR_SPI_SLAVE_0_BASEADDR 0x44A70000
 #define XPAR_SPI_SLAVE_0_HIGHADDR 0x44A7FFFF
-
-
 
 
 

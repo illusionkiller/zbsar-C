@@ -10,7 +10,7 @@
 		<project>nanopb</project>
 		<project>shell</project>
 		<project>tiny_crypt</project>
-		<project>ZBSAR_TOP</project>
+		<project>project</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

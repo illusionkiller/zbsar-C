@@ -3,7 +3,7 @@
 	<name>cJson</name>
 	<comment>Created by Vitis v2023.1</comment>
 	<projects>
-		<project>ZBSAR_TOP</project>
+		<project>project</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

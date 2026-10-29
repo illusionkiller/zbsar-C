@@ -53,17 +53,17 @@
                                 								
                                 <option id="xilinx.gnu.compiler.dircategory.includes.1806865960" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" useByScannerDiscovery="false" valueType="includePath">
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/ZBSAR_TOP/microblaze_0/freertos10_xilinx_microblaze_0/bsp/microblaze_0/include}&quot;"/>
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/project/microblaze_0/freertos10_xilinx_domain/bsp/microblaze_0/include}&quot;"/>
                                     								
                                 </option>
                                 								
-                                <option id="xilinx.gnu.mb.compiler.inferred.usediv.609591188" superClass="xilinx.gnu.mb.compiler.inferred.usediv" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="xilinx.gnu.mb.compiler.inferred.usediv.609591188" name="Use hardware divider (-mno-xl-soft-div)" superClass="xilinx.gnu.mb.compiler.inferred.usediv" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
-                                <option id="xilinx.gnu.mb.compiler.inferred.usepcmp.1123756711" superClass="xilinx.gnu.mb.compiler.inferred.usepcmp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="xilinx.gnu.mb.compiler.inferred.usepcmp.1123756711" name="Use Pattern Compare (-mxl-pattern-compare)" superClass="xilinx.gnu.mb.compiler.inferred.usepcmp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
-                                <option id="xilinx.gnu.mb.compiler.inferred.usebarrel.932439805" superClass="xilinx.gnu.mb.compiler.inferred.usebarrel" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="xilinx.gnu.mb.compiler.inferred.usebarrel.932439805" name="Use Barrel Shifter (-mxl-barrel-shift)" superClass="xilinx.gnu.mb.compiler.inferred.usebarrel" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
-                                <option id="xilinx.gnu.mb.compiler.inferred.usele.1360382311" superClass="xilinx.gnu.mb.compiler.inferred.usele" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="xilinx.gnu.mb.compiler.inferred.usele.1360382311" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.compiler.inferred.usele" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
                                 <inputType id="xilinx.gnu.compiler.input.131933261" name="C source files" superClass="xilinx.gnu.compiler.input"/>
                                 							
